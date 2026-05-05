@@ -4,6 +4,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Feliz Cumpleaños Makunga ⚡⚽</title>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;600&family=Lato:wght@300;400&display=swap" rel="stylesheet">
 <style>
@@ -35,24 +37,36 @@ position: absolute; border-radius: 50%; background: #b8ffb8;
 animation: twinkle var(–d, 3s) ease-in-out infinite alternate;
 opacity: var(–o, 0.4);
 }
+@-webkit-keyframes twinkle { from { opacity: 0.05; -webkit-transform: scale(0.8); } to { opacity: 0.7; -webkit-transform: scale(1.2); } }
 @keyframes twinkle { from { opacity: 0.05; transform: scale(0.8); } to { opacity: 0.7; transform: scale(1.2); } }
 
 /* ── Snitch ── */
 .snitch {
-position: fixed; width: 22px; height: 22px;
+position: fixed;
+width: 78px; height: 22px;
+z-index: 10; -webkit-animation: fly 18s ease-in-out infinite; animation: fly 18s ease-in-out infinite; pointer-events: none;
+display: flex; align-items: center; justify-content: center;
+}
+.snitch-body {
+width: 22px; height: 22px; flex-shrink: 0;
 background: radial-gradient(circle at 35% 35%, #ffe066, #c8960a);
 border-radius: 50%;
 box-shadow: 0 0 12px 4px #f5c84288;
-z-index: 10; animation: fly 18s ease-in-out infinite; pointer-events: none;
+position: relative; z-index: 2;
 }
-.snitch::before, .snitch::after {
-content: ‘’; position: absolute; top: 50%; transform: translateY(-50%);
+.snitch-wing {
 width: 28px; height: 12px;
 background: rgba(255,220,100,0.35); border-radius: 50%;
-border: 1px solid rgba(255,220,100,0.5);
+border: 1px solid rgba(255,220,100,0.6);
+flex-shrink: 0;
 }
-.snitch::before { left: -26px; transform: translateY(-50%) rotate(-20deg); }
-.snitch::after  { right: -26px; transform: translateY(-50%) rotate(20deg); }
+.snitch-wing-left  { transform: rotate(-20deg); }
+.snitch-wing-right { transform: rotate(20deg); }
+@-webkit-keyframes fly {
+0%   { top:20%;left:10%; } 15% { top:60%;left:80%; } 30% { top:10%;left:50%; }
+45%  { top:75%;left:25%; } 60% { top:30%;left:90%; } 75% { top:55%;left:5%; }
+90%  { top:15%;left:70%; } 100%{ top:20%;left:10%; }
+}
 @keyframes fly {
 0%   { top:20%;left:10%; } 15% { top:60%;left:80%; } 30% { top:10%;left:50%; }
 45%  { top:75%;left:25%; } 60% { top:30%;left:90%; } 75% { top:55%;left:5%; }
@@ -129,8 +143,10 @@ font-size:clamp(2rem,8vw,3rem); font-weight:900; text-align:center;
 background:linear-gradient(135deg, #c0c0c0, #ffffff, #a0d0a0, #c0c0c0);
 background-size:300% 300%;
 -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+-webkit-font-smoothing: antialiased;
 animation:shimmer 3s ease-in-out infinite; line-height:1.1; margin-bottom:18px;
 }
+@-webkit-keyframes shimmer { 0%,100%{background-position:0% 50%;} 50%{background-position:100% 50%;} }
 @keyframes shimmer { 0%,100%{background-position:0% 50%;} 50%{background-position:100% 50%;} }
 
 /* ── Divider ── */
@@ -278,6 +294,10 @@ position:fixed; width:8px; height:8px; z-index:4; pointer-events:none;
 animation:confettiFall var(–cf,4s) ease-in forwards; top:-10px;
 border-radius:var(–cr,0);
 }
+@-webkit-keyframes confettiFall {
+0%{ transform:translateX(0) rotate(0deg); opacity:1; }
+100%{ transform:translateX(var(–cx,20px)) translateY(100vh) rotate(720deg); opacity:0; }
+}
 @keyframes confettiFall {
 0%{ transform:translateX(0) rotate(0deg); opacity:1; }
 100%{ transform:translateX(var(–cx,20px)) translateY(100vh) rotate(720deg); opacity:0; }
@@ -286,8 +306,35 @@ border-radius:var(–cr,0);
 
 </head>
 <body>
+<!-- Audio -->
+<audio id="bgMusic" loop>
+  <source src="musica.mp3" type="audio/mpeg">
+</audio>
+
+<!-- Botón para activar música (necesario en Safari/iOS) -->
+
+<div id="musicPrompt" style="
+  position:fixed; inset:0; z-index:200;
+  background:rgba(6,14,6,0.92);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:20px; backdrop-filter:blur(8px);
+">
+  <div style="font-size:4rem; animation:pulse 2s ease-in-out infinite;">⚡</div>
+  <p style="font-family:'Cinzel',serif; color:#c0c0c0; font-size:1rem; letter-spacing:3px; text-align:center; padding:0 30px;">
+    Toca para abrir<br>la tarjeta mágica
+  </p>
+  <button id="startBtn" style="
+    background:linear-gradient(135deg,#1a4a1a,#2d7a2d);
+    border:2px solid #3aaa3a; border-radius:60px;
+    padding:14px 36px; cursor:pointer;
+    font-family:'Cinzel',serif; color:#c0c0c0;
+    font-size:0.95rem; letter-spacing:2px;
+    box-shadow:0 0 20px #3aaa3a44;
+  ">🎵 Abrir</button>
+</div>
+
 <div id="stars"></div>
-<div class="snitch"></div>
+<div class="snitch"><div class="snitch-wing snitch-wing-left"></div><div class="snitch-body"></div><div class="snitch-wing snitch-wing-right"></div></div>
 <div class="ball" style="left:5%;top:30%;--bd:7s">⚽</div>
 <div class="ball" style="left:88%;top:20%;--bd:9s;animation-delay:2s">⚽</div>
 <div class="ball" style="left:50%;top:70%;--bd:11s;animation-delay:1s">🏆</div>
